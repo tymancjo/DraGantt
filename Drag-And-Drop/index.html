@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+  <title>Document</title>
+</head>
+<body>
+  <div class="weeks">
+      <div id="fweek"class="oneweek" draggable="false"></div>
+
+  </div>
+  <div class="first">
+      <div class="container">
+          <h2>Current</h2>
+      </div>
+      <div id="timeline" class="container"></div>
+
+      <div class="sourcecontainer">
+        <div id="enew" class="draggable fresh" draggable="true">Void</div>
+        <div id="tnew" class="draggable fresh" draggable="true">New</div>
+      </div>
+
+      <div class="terminal">
+            <textarea id="konsola" name="konsola" rows="4" cols="50"></textarea>
+            <button id="grabdata">Grab Data</button>
+            <button id="refresh">Refresh View</button>
+            <button id="readback">RB</button>
+      </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+body {
+  margin: 0;
+}
+
+.weeks {
+    position: absolute;
+    background-color: #aaa;
+    padding: 0px;
+    margin: 0px;
+    min-width: 2180px;
+    min-height: 50px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: -1;
+}
+
+.oneweek {
+    background-color: #aac;
+    padding: 0px;
+    margin: 0px;
+    min-width: 40px;
+    min-height: 600px;
+    border-right: 1px solid #000;
+    display: inline-block;
+    text-align: center;
+}
+.container {
+    display: flex;
+    position: relative;
+    background-color: rgba(100,100,100,0.4);
+    padding: 0px;
+    margin-top: 1rem;
+    min-width: 2180px;
+    min-height: 50px;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: top;
+    z-index: 2;
+}
+.sourcecontainer {
+    position: relative;
+    background-color: rgba(100,150,100,0.4);
+    padding: 0px;
+    margin-top: 1rem;
+    min-width: 1560px;
+    min-height: 50px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    z-index: 2;
+}
+
+.first {
+    padding-top: 50px;
+}
+
+.draggable {
+    padding: 0px;
+    margin: 0px;
+    margin-left: -1px;
+    background-color: white;
+    border: 1px solid black;
+    cursor: move;
+    display: inline-block;
+    min-height: 35px;
+    min-width: 10px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.draggable.dragging {
+  opacity: .5;
+}
+
+.draggable.fresh {
+
+}
