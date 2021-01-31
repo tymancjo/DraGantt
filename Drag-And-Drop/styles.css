@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 .weeks {
@@ -16,7 +17,7 @@ body {
 }
 
 .oneweek {
-    background-color: #aac;
+    background-color: #99b;
     padding: 0px;
     margin: 0px;
     min-width: 40px;
@@ -32,7 +33,7 @@ body {
     padding: 0px;
     margin-top: 1rem;
     min-width: 2180px;
-    min-height: 50px;
+    min-height: 80px;
     overflow: hidden;
     white-space: nowrap;
     vertical-align: top;
@@ -51,16 +52,22 @@ body {
     z-index: 2;
 }
 
+.container.trash {
+    background-color: rgba(150,100,100,0.4);
+
+}
 .first {
     padding-top: 50px;
 }
 
 .draggable {
-    padding: 0px;
+    padding: 4px;
     margin: 0px;
     margin-left: -1px;
     background-color: white;
-    border: 1px solid black;
+    color: white;
+    border: 1px solid white;
+    border-radius: 4px;
     cursor: move;
     display: inline-block;
     min-height: 35px;

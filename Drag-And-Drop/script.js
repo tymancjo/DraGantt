@@ -1,4 +1,9 @@
+const colors = ['#28559a','#3778c2','#4b9fe1','#63bce5','#7ed5eaj'];
+// '#9cf6fb','#e1fcfd','#394f8a','#4a5fc1','#e5b9a8','#ead6cd'
+
+let allTasks0 = [];
 let allTasks = [];
+
 
 let draggables = document.querySelectorAll('.draggable')
 const containers = document.querySelectorAll('.container')
@@ -8,6 +13,7 @@ const grabdata = document.getElementById('grabdata');
 const konsola = document.getElementById('konsola');
 
 const oneweek = document.getElementById('fweek');
+const timeline0 = document.getElementById('timeline0');
 const timeline = document.getElementById('timeline');
 const tnew = document.getElementById('tnew');
 const enew = document.getElementById('enew');
@@ -19,6 +25,7 @@ window.addEventListener('resize', refreshTimeline);
 grabdata.addEventListener('click', grabDataFromConsole);
 refresh.addEventListener('click', refreshTimeline);
 readback.addEventListener('click', readFrom);
+cleartrash.addEventListener('click', clearTrash);
 
 // creating the calendar for weeks 
 calendar.removeChild(oneweek);
@@ -34,11 +41,9 @@ for (let i=1; i < 53; i++){
 // adding some random size just for fun and to have something to start with
 //
 draggables.forEach(element => {
-    element.setAttribute("style","width:100px");
-    let sizeX = Math.random() * 200 + 30;
-    let sizeTxt = sizeX + 'px'
+    let w1 = document.querySelectorAll('.oneweek')[1].clientWidth;
+    let sizeTxt = w1 + 'px'
     element.style.width = sizeTxt;
-
 })
 
 function makeSetup(){
@@ -50,7 +55,18 @@ function makeSetup(){
 
       draggable.addEventListener('dragend', () => {
         draggable.classList.remove('dragging')
-        readFromTimeline(timeline);
+
+        let isfresh = draggable.classList.contains('fresh');
+        allTasks = readFromTimeline(timeline);
+        allTasks0 = readFromTimeline(timeline0);
+
+        if (isfresh){
+            let nowyelement = draggable.cloneNode(true);
+            nowyelement.classList.remove('dragging')
+            zasobnik.appendChild(nowyelement);
+            draggable.classList.remove('fresh');
+            makeSetup(); 
+        }
         refreshTimeline();
       })
     })
@@ -64,26 +80,26 @@ containers.forEach(container => {
     e.preventDefault()
     const afterElement = getDragAfterElement(container, e.clientX)
     const draggable = document.querySelector('.dragging')
-    let isfresh = draggable.classList.contains('fresh');
 
     if (afterElement == null) {
         container.appendChild(draggable)
-        if (isfresh){
-            let nowyelement = draggable.cloneNode(true);
-            nowyelement.classList.remove('dragging')
-            zasobnik.appendChild(nowyelement);
-            draggable.classList.remove('fresh');
-            makeSetup(); 
-        }
+        //if (isfresh){
+            //let nowyelement = draggable.cloneNode(true);
+            //nowyelement.classList.remove('dragging')
+            //zasobnik.appendChild(nowyelement);
+            //draggable.classList.remove('fresh');
+            //allTasks.push(['New', 1]);
+            //makeSetup(); 
+        //}
     } else {
       container.insertBefore(draggable, afterElement)
-        if (isfresh){
-            let nowyelement = draggable.cloneNode(true);
-            nowyelement.classList.remove('dragging')
-            zasobnik.appendChild(nowyelement);
-            draggable.classList.remove('fresh');
-            makeSetup(); 
-        }
+        //if (isfresh){
+            //let nowyelement = draggable.cloneNode(true);
+            //nowyelement.classList.remove('dragging')
+            //zasobnik.appendChild(nowyelement);
+            //draggable.classList.remove('fresh');
+            //makeSetup(); 
+        //}
     }
   })
 })
@@ -137,7 +153,9 @@ function grabDataFromConsole(){
     if (allText != ""){
         results = allText.split(/\r?\n/);
 
-        results.forEach( el => {
+        results.forEach( (el,i) => {
+            thiscolor = colors[i % colors.length];
+            
             line = el.split(':');
 
             let duration;
@@ -150,7 +168,7 @@ function grabDataFromConsole(){
 
             thisname = line[0].trim();
             
-            let thisTask = [thisname, duration];
+            let thisTask = [thisname, duration, thiscolor];
             allTasks.push(thisTask);
             
             // adding the tasks to timeline
@@ -161,7 +179,7 @@ function grabDataFromConsole(){
     }
 }
 
-function drawAllTasks(tasks, parentObject, newTaskObj, weekPx){
+function drawAllTasks(tasks, parentObject, newTaskObj, weekPx, pad=4){
     // cleaning all childes from parent object
     while (parentObject.firstChild) 
         parentObject.removeChild(parentObject.lastChild);
@@ -170,11 +188,18 @@ function drawAllTasks(tasks, parentObject, newTaskObj, weekPx){
     tasks.forEach( (el,i) => {
         duration = el[1];
         thisname = el[0];
+        thiscolor = el[2];
         
         newItem = newTaskObj.cloneNode(true);
         newItem.classList.remove('fresh');
-        newItem.style.width = (duration - 1) + 1.0 * duration * weekPx + "px";
+        newItem.style.width = (duration - 1) + 1.0 * duration * weekPx - 2*pad + "px";
+        newItem.style.backgroundColor = thiscolor;
         newItem.innerHTML = i + ": "+thisname;
+
+        newItem.setAttribute('data-name',thisname);
+        newItem.setAttribute('data-duration',duration);
+        newItem.setAttribute('data-color',thiscolor);
+
         parentObject.appendChild(newItem);
     } );
 
@@ -184,10 +209,16 @@ function drawAllTasks(tasks, parentObject, newTaskObj, weekPx){
 function refreshTimeline(){
     let w1 = document.querySelectorAll('.oneweek')[1];
     drawAllTasks(allTasks, timeline, tnew, w1.clientWidth);
+    drawAllTasks(allTasks0, timeline0, tnew, w1.clientWidth);
+}
+
+function clearTrash(){
+    drawAllTasks([], trashcan, tnew, 0);
 }
 
 function readFrom(){
-    readFromTimeline(timeline);
+    allTasks = readFromTimeline(timeline);
+    allTasks0 = readFromTimeline(timeline0);
 }
 
 function readFromTimeline(timelineObject){
@@ -198,12 +229,14 @@ function readFromTimeline(timelineObject){
 
     for( i=0; i < allChildren.length; i++ ){
         el = allChildren[i];
-        let thistext = el.innerHTML;
-        let thisTask = thistext.split(': ');
-        let index = parseInt(thisTask[0]);
-        tempTasks.push(allTasks[index]);
+        let thisName = el.getAttribute('data-name');
+        let thisDuration = parseFloat(el.getAttribute('data-duration'));
+        let thisColor = el.getAttribute('data-color');
+        tempTasks.push([thisName, thisDuration, thisColor]);
     }
     
-    allTasks = [];
-    tempTasks.forEach(el => {allTasks.push(el)});
+    timelineArray = [];
+    tempTasks.forEach(el => {timelineArray.push(el)});
+
+    return timelineArray;
 }
