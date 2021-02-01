@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<style>
+
+body {
+  margin: 0;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+.weeks {
+    position: absolute;
+    background-color: #aaa;
+    padding: 0px;
+    margin: 0px;
+    min-width: 2180px;
+    min-height: 50px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: -1;
+}
+
+.oneweek {
+    background-color: #99b;
+    padding: 0px;
+    margin: 0px;
+    min-width: 40px;
+    min-height: 600px;
+    border-right: 1px solid #000;
+    display: inline-block;
+    text-align: center;
+}
+.container {
+    display: flex;
+    position: relative;
+    background-color: rgba(100,100,100,0.4);
+    padding: 0px;
+    margin-top: 1rem;
+    min-width: 2180px;
+    min-height: 80px;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: top;
+    z-index: 2;
+}
+.sourcecontainer {
+    position: relative;
+    background-color: rgba(100,150,100,0.4);
+    padding: 0px;
+    margin-top: 1rem;
+    min-width: 1560px;
+    min-height: 50px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    z-index: 2;
+}
+
+.container.trash {
+    background-color: rgba(150,100,100,0.4);
+
+}
+.first {
+    padding-top: 50px;
+}
+
+.draggable {
+    padding: 4px;
+    margin: 0px;
+    margin-left: -1px;
+    background-color: white;
+    color: white;
+    border: 1px solid white;
+    border-radius: 4px;
+    cursor: move;
+    display: inline-block;
+    min-height: 35px;
+    min-width: 10px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.draggable.dragging {
+  opacity: .5;
+}
+
+.draggable.fresh {
+
+}
+</style>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+  <title>Document</title>
+</head>
+<body>
+  <div class="weeks">
+      <div id="fweek"class="oneweek" draggable="false"></div>
+
+  </div>
+  <div class="first">
+      <div id="timeline0" class="container"></div>
+      TIMELINE 0
+      <div id="timeline" class="container"></div>
+      TIMELINE 1
+      <div id="trashcan" class="container trash"></div>
+      TRASHCAN  <button id="cleartrash">Empty Trash Line</button>
+
+      <div class="sourcecontainer">
+        <div id="enew" class="draggable fresh" draggable="true">Void</div>
+        <div id="tnew" class="draggable fresh" draggable="true">New</div>
+      </div>
+
+      <div class="terminal">
+            <textarea id="konsola" name="konsola" rows="4" cols="50">
+Pierwsze Badania:3
+Drugie Badania:2
+Trzecie Badania:1
+Czwarte Badania o długiej nazwie:2
+I jeszcze inne:1
+A na koniec takie:2
+            </textarea>
+            <br>
+            <button id="grabdata">Grab Data</button>
+            <button id="refresh">Refresh View</button>
+            <button id="readback">RB</button>
+      </div>
+  </div>
+</body>
+<script>
+
+const colors = ['#28559a','#3778c2','#4b9fe1','#394f8a','#4a5fc1','#e5b9a8','#ead6cd'];
+// '#9cf6fb','#e1fcfd','#394f8a','#4a5fc1','#e5b9a8','#ead6cd'
+
+let allTasks0 = [];
+let allTasks = [];
+
+
+let draggables = document.querySelectorAll('.draggable')
+const containers = document.querySelectorAll('.container')
+const calendar = document.querySelectorAll('.weeks')[0];
+const zasobnik = document.querySelectorAll('.sourcecontainer')[0];
+const grabdata = document.getElementById('grabdata');
+const konsola = document.getElementById('konsola');
+
+const oneweek = document.getElementById('fweek');
+const timeline0 = document.getElementById('timeline0');
+const timeline = document.getElementById('timeline');
+const tnew = document.getElementById('tnew');
+const enew = document.getElementById('enew');
+
+// binding action to resize event
+window.addEventListener('resize', refreshTimeline);
+
+// binding the action to the button
+grabdata.addEventListener('click', grabDataFromConsole);
+refresh.addEventListener('click', refreshTimeline);
+readback.addEventListener('click', readFrom);
+cleartrash.addEventListener('click', clearTrash);
+
+// creating the calendar for weeks 
+calendar.removeChild(oneweek);
+for (let i=1; i < 53; i++){
+    let newweek = oneweek.cloneNode(true);
+    newweek.innerText = i;
+    calendar.appendChild(newweek);
+}
+
+// reading some data from default file from server
+//loadFileAndPrintToConsole('https://threejsfundamentals.org/LICENSE');
+//readTextFile('./def.data');
+// adding some random size just for fun and to have something to start with
+//
+draggables.forEach(element => {
+    let w1 = document.querySelectorAll('.oneweek')[1].clientWidth;
+    let sizeTxt = w1 + 'px'
+    element.style.width = sizeTxt;
+})
+
+function makeSetup(){
+    draggables = document.querySelectorAll('.draggable')
+    draggables.forEach(draggable => {
+      draggable.addEventListener('dragstart', () => {
+        draggable.classList.add('dragging')
+      })
+
+      draggable.addEventListener('dragend', () => {
+        draggable.classList.remove('dragging')
+
+        let isfresh = draggable.classList.contains('fresh');
+        allTasks = readFromTimeline(timeline);
+        allTasks0 = readFromTimeline(timeline0);
+
+        if (isfresh){
+            let nowyelement = draggable.cloneNode(true);
+            nowyelement.classList.remove('dragging')
+            zasobnik.appendChild(nowyelement);
+            draggable.classList.remove('fresh');
+            makeSetup(); 
+        }
+        refreshTimeline();
+      })
+    })
+}
+
+
+makeSetup(); 
+grabDataFromConsole();
+
+
+containers.forEach(container => {
+  container.addEventListener('dragover', e => {
+    e.preventDefault()
+    const afterElement = getDragAfterElement(container, e.clientX)
+    const draggable = document.querySelector('.dragging')
+
+    if (afterElement == null) {
+        container.appendChild(draggable)
+        //if (isfresh){
+            //let nowyelement = draggable.cloneNode(true);
+            //nowyelement.classList.remove('dragging')
+            //zasobnik.appendChild(nowyelement);
+            //draggable.classList.remove('fresh');
+            //allTasks.push(['New', 1]);
+            //makeSetup(); 
+        //}
+    } else {
+      container.insertBefore(draggable, afterElement)
+        //if (isfresh){
+            //let nowyelement = draggable.cloneNode(true);
+            //nowyelement.classList.remove('dragging')
+            //zasobnik.appendChild(nowyelement);
+            //draggable.classList.remove('fresh');
+            //makeSetup(); 
+        //}
+    }
+  })
+})
+
+function getDragAfterElement(container, x) {
+  const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')]
+
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect()
+    const offset = x - box.left - box.width / 2
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child }
+    } else {
+      return closest
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element
+}
+
+
+async function loadFileAndPrintToConsole(url) {
+  try {
+    const response = await fetch(url);
+    const data = await response.text();
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                alert(allText);
+            }
+        }
+    }
+    rawFile.send(null);
+}
+
+function grabDataFromConsole(){
+
+    let allText = konsola.value.trim();
+    if (allText != ""){
+        results = allText.split(/\r?\n/);
+
+        results.forEach( (el,i) => {
+            thiscolor = colors[i % colors.length];
+            
+            line = el.split(':');
+
+            let duration;
+            if (line.length < 2){
+                duration = 1;
+            } else {
+                duration = parseFloat(line[1]);
+                if (duration == "NaN") duration = 1;
+            }
+
+            thisname = line[0].trim();
+            
+            let thisTask = [thisname, duration, thiscolor];
+            allTasks.push(thisTask);
+            
+            // adding the tasks to timeline
+        } );
+        refreshTimeline();
+    } else {
+        console.log("No input data");
+    }
+}
+
+function drawAllTasks(tasks, parentObject, newTaskObj, weekPx, pad=4){
+    // cleaning all childes from parent object
+    while (parentObject.firstChild) 
+        parentObject.removeChild(parentObject.lastChild);
+    
+    // adding new childes
+    tasks.forEach( (el,i) => {
+        duration = el[1];
+        thisname = el[0];
+        thiscolor = el[2];
+        
+        newItem = newTaskObj.cloneNode(true);
+        newItem.classList.remove('fresh');
+        newItem.style.width = (duration - 1) + 1.0 * duration * weekPx - 2*pad + "px";
+        newItem.style.backgroundColor = thiscolor;
+        newItem.innerHTML = i + ": "+thisname;
+
+        newItem.setAttribute('data-name',thisname);
+        newItem.setAttribute('data-duration',duration);
+        newItem.setAttribute('data-color',thiscolor);
+
+        parentObject.appendChild(newItem);
+    } );
+
+    makeSetup(); // to bind event handlers
+}
+
+function refreshTimeline(){
+    let w1 = document.querySelectorAll('.oneweek')[1];
+    drawAllTasks(allTasks, timeline, tnew, w1.clientWidth);
+    drawAllTasks(allTasks0, timeline0, tnew, w1.clientWidth);
+}
+
+function clearTrash(){
+    drawAllTasks([], trashcan, tnew, 0);
+}
+
+function readFrom(){
+    allTasks = readFromTimeline(timeline);
+    allTasks0 = readFromTimeline(timeline0);
+}
+
+function readFromTimeline(timelineObject){
+    let allChildren = timelineObject.children;
+    allChildren = Array.from(allChildren);
+
+    let tempTasks = [];
+
+    for( i=0; i < allChildren.length; i++ ){
+        el = allChildren[i];
+        let thisName = el.getAttribute('data-name');
+        let thisDuration = parseFloat(el.getAttribute('data-duration'));
+        let thisColor = el.getAttribute('data-color');
+        tempTasks.push([thisName, thisDuration, thisColor]);
+    }
+    
+    timelineArray = [];
+    tempTasks.forEach(el => {timelineArray.push(el)});
+
+    return timelineArray;
+}
+</script>
+</html>
