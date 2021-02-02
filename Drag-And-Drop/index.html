@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="styles.css">
+  <script src="la_color_picker.js" defer></script>
   <script src="script.js" defer></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -29,6 +30,27 @@
       </div>
 
       <div class="terminal">
+           <div class="tleft">
+               Task name:
+               <br>
+               <input type=text id="activeName"></input>
+               <br>
+               Task duration [days]:
+               <br>
+               <input type=text id="activeDuration"></input>
+               <br>
+            <button id="activeDn">-</button>
+            <button id="activeUp">+</button>
+            <button id="activeUpdate">Update</button>
+               <br>
+               <input type=text id="activeColor"></input>
+               <br>
+               <div class="palette" id="colorPalette"></div>
+
+           </div>
+          <div class="tleft">
+            Add new tasks to TIMELINE 1
+            <br>
             <textarea id="konsola" name="konsola" rows="4" cols="50">
 A:3
 B:2
@@ -36,9 +58,11 @@ C:1
 D:2
             </textarea>
             <br>
-            <button id="grabdata">Grab Data</button>
-            <button id="refresh">Refresh View</button>
-            <button id="readback">RB</button>
+            <button id="grabdata">text to tasks</button>
+            <button id="getastext">read to text</button>
+            <!--<button id="refresh">Refresh View</button>-->
+            <!--<button id="readback">RB</button>-->
+           </div>
       </div>
   </div>
 </body>

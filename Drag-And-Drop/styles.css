@@ -8,7 +8,7 @@ body {
     background-color: #aaa;
     padding: 0px;
     margin: 0px;
-    min-width: 2180px;
+    min-width: 5300px;
     min-height: 50px;
     width: 100%;
     overflow: hidden;
@@ -17,15 +17,24 @@ body {
 }
 
 .oneweek {
-    background-color: #99b;
+    background-color: #9b9;
     padding: 0px;
     margin: 0px;
-    min-width: 40px;
+    min-width: 100px;
     min-height: 600px;
     border-right: 1px solid #000;
     display: inline-block;
     text-align: center;
 }
+
+.currentWeek{
+    background-color: #9bb;
+}
+
+.pastWeek {
+    background-color: #99b;
+}
+
 .container {
     display: flex;
     position: relative;
@@ -33,6 +42,7 @@ body {
     padding: 0px;
     margin-top: 1rem;
     min-width: 2180px;
+    width: 100%;
     min-height: 80px;
     overflow: hidden;
     white-space: nowrap;
@@ -49,7 +59,7 @@ body {
     overflow: hidden;
     white-space: nowrap;
     display: block;
-    z-index: 2;
+    z-index: -2;
 }
 
 .container.trash {
@@ -58,6 +68,8 @@ body {
 }
 .first {
     padding-top: 50px;
+    min-width: 5300px;
+    width: 100%;
 }
 
 .draggable {
@@ -71,15 +83,69 @@ body {
     cursor: move;
     display: inline-block;
     min-height: 35px;
-    min-width: 10px;
+    min-width: 1px;
     word-wrap: break-word;
     white-space: normal;
+    box-shadow: 0px 0px 3px gray;
 }
 
 .draggable.dragging {
   opacity: .5;
 }
 
+.activeTask{
+    border: 1px solid orange;
+    box-shadow: 0px 0px 3px orange;
+}
+
 .draggable.fresh {
 
+}
+
+.terminal{
+    color: white;
+    position: fixed;
+    vertical-align: top;
+    background-color: #3778c2;
+    border-radius: 15px;
+    margin-left: 30px;
+    margin-top: 30px;
+    box-shadow: 0px 0px 15px gray;
+
+}
+.tleft {
+    display: inline-block;
+    padding: 20px;
+}
+
+
+
+.color-palette {
+  height: 100px;
+  width: 100px;
+  background: red;
+  display: none;
+}
+.palette {
+  margin-top: 5px;
+  width: 270px;
+  height: 220px;
+  background: #efefef;
+  border: 1px solid #bcbcbc;
+  border-radius: 1px;
+  display: none;
+  padding: 1px;
+  position: absolute;
+  z-index: 1000;
+}
+.color-option {
+  width: 18px;
+  height: 18px;
+  margin: 3px;
+  cursor:pointer;
+  float: left;
+}
+#colorPicker {
+    border: 0px;
+    border-right: 5px solid #003cb3;
 }
