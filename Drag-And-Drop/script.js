@@ -2,7 +2,6 @@ const colors = ['#28559a','#3778c2','#4b9fe1','#63bce5','#7ed5eaj','#9cf6fb','#e
 
 let allTasks0 = [];
 let allTasks = [];
-let Tasks = [allTasks0, allTasks];
 
 let draggables = document.querySelectorAll('.draggable')
 let activeTask = null;
@@ -21,6 +20,11 @@ const enew = document.getElementById('enew');
 const aName = document.getElementById('activeName');
 const aDuration = document.getElementById('activeDuration');
 const aColor = document.getElementById('activeColor');
+
+let Tasks = [allTasks0, allTasks];
+let Timelines = [timeline0, timeline];
+
+
 // binding action to resize scroll and so on event
 window.addEventListener('resize', refreshTimeline);
 
@@ -211,8 +215,9 @@ function drawAllTasks(tasks, parentObject, newTaskObj){
 function refreshTimeline(){
     let w1 = document.querySelectorAll('.oneweek')[1];
     w1 = w1.clientWidth - 1;
-    drawAllTasks(allTasks, timeline, tnew, w1);
-    drawAllTasks(allTasks0, timeline0, tnew, w1);
+    Tasks.forEach((tsk,i)=>{
+        drawAllTasks(tsk, Timelines[i], tnew, w1);
+    })
 }
 
 function clearTrash(){
@@ -220,8 +225,9 @@ function clearTrash(){
 }
 
 function readFrom(){
-    allTasks = readFromTimeline(timeline);
-    allTasks0 = readFromTimeline(timeline0);
+    Tasks.forEach((tsk,i)=>{
+        Tasks[i] = readFromTimeline(Timelines[i]);
+    })
 }
 
 
@@ -307,9 +313,10 @@ function updateActive(dayChange=0){
 
         let thisTask = [thisname, duration_days, thiscolor];
         allTasks.push(thisTask);
-        let w1 = document.querySelectorAll('.oneweek')[1];
-        w1 = w1.clientWidth - 1;
-        drawAllTasks(allTasks, timeline, tnew, w1);
+        //let w1 = document.querySelectorAll('.oneweek')[1];
+        //w1 = w1.clientWidth - 1;
+        //drawAllTasks(allTasks, timeline, tnew, w1);
+        refreshTimeline();
     }
 }
 
@@ -327,7 +334,6 @@ function redrawTask(task, thisname, thiscolor, duration, i=0){
         task.style.width = Math.floor(addendum + 1.0 * duration * w1 - 2*pad) + "px";
         task.style.backgroundColor = thiscolor;
         task.innerHTML = thisname;
-        //task.innerHTML = i + ": "+thisname;
 }
 
 function makeSetup(){
@@ -340,8 +346,7 @@ function makeSetup(){
       draggable.addEventListener('dragend', () => {
         draggable.classList.remove('dragging')
 
-        allTasks = readFromTimeline(timeline);
-        allTasks0 = readFromTimeline(timeline0);
+          readFrom();
 
         refreshTimeline();
       })
