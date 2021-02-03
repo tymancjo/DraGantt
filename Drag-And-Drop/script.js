@@ -2,6 +2,7 @@ const colors = ['#28559a','#3778c2','#4b9fe1','#63bce5','#7ed5eaj','#9cf6fb','#e
 
 let allTasks0 = [];
 let allTasks = [];
+let allTasks1 = [];
 
 let draggables = document.querySelectorAll('.draggable')
 let activeTask = null;
@@ -26,8 +27,8 @@ const loadfile = document.getElementById('fileinput');
 const preloadeddata = document.getElementById('preloadeddata');
 const kcolaps = document.getElementById('kcolaps');
 
-let Tasks = [allTasks0, allTasks];
-let Timelines = [timeline0, timeline];
+let Tasks = [allTasks0, allTasks, allTasks1];
+let Timelines = [timeline0, timeline, timeline1];
 
 
 // binding action to resize scroll and so on event
