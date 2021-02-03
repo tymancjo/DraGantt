@@ -20,6 +20,11 @@ const enew = document.getElementById('enew');
 const aName = document.getElementById('activeName');
 const aDuration = document.getElementById('activeDuration');
 const aColor = document.getElementById('activeColor');
+const tod = document.getElementById('tod');
+const updateButton = document.getElementById('activeUpdate');
+const loadfile = document.getElementById('fileinput');
+const preloadeddata = document.getElementById('preloadeddata');
+const kcolaps = document.getElementById('kcolaps');
 
 let Tasks = [allTasks0, allTasks];
 let Timelines = [timeline0, timeline];
@@ -40,16 +45,41 @@ document.addEventListener('click', function(e) {
 grabdata.addEventListener('click', grabDataFromConsole);
 getastext.addEventListener('click', grabDataToConsole);
 cleartrash.addEventListener('click', clearTrash);
+loadfile.addEventListener('change', loadFromExternalFile);
+loadfilebutton.addEventListener('click', ()=>{loadfile.click();});
+loaddefault.addEventListener('click', loadDefaultData);
+savefilebutton.addEventListener('click', download );
 
 // panel buttons actions binding
 activeUpdate.addEventListener('click', ()=> {updateActive(0)});
 activeUp.addEventListener('click', () => {updateActive(1)});
 activeDn.addEventListener('click', () => {updateActive(-1)});
+toggler.addEventListener('click', toggleKonsola);
+
+// some variables
+let konsolaState = false;
+
+function toggleKonsola(){
+    console.log("coś tam robię")
+    if ( konsolaState ) {
+        kcolaps.classList.add('hidden');
+        toggler.innerText = "Show";
+    } else {
+       kcolaps.classList.remove('hidden');
+        toggler.innerText = "Hide";
+    }
+    konsolaState = !konsolaState;
+}
 
 // creating the calendar for weeks
-const curretnWeek = getWeekNumber(new Date())[1];
-console.log(curretnWeek);
+const isNow = new Date();
+const curretnWeek = getWeekNumber(isNow)[1];
+const dayOfWeek = isNow.getDay();
+if(dayOfWeek > 5) dayOfWeek = 5; // just using work days
+console.log(curretnWeek + "//" + dayOfWeek);
+
 calendar.removeChild(oneweek);
+
 for (let i=1; i < 53; i++){
     let newweek = oneweek.cloneNode(true);
     newweek.innerText = i;
@@ -58,11 +88,16 @@ for (let i=1; i < 53; i++){
     calendar.appendChild(newweek);
 }
 
+        let w1 = document.querySelectorAll('.oneweek')[1].clientWidth - 2;
+        let d = curretnWeek - 1 + dayOfWeek  / 5;
+        let addendum = 2*Math.floor(d) -1;
+        if (addendum <= 0) addendum = 0;
+        let sizeTxt = Math.floor(addendum + 1.0 * d* w1 ) + "px";
+        tod.style.marginLeft = sizeTxt;
+
 // reading some data from default file from server
 //loadFileAndPrintToConsole('https://threejsfundamentals.org/LICENSE');
 //readTextFile('./def.data');
-// adding some random size just for fun and to have something to start with
-//
 
 draggables.forEach(element => {
     let w1 = document.querySelectorAll('.oneweek')[1].clientWidth - 2;
@@ -253,7 +288,11 @@ function makeActive(target, markAgain = true){
         if (target == activeTask && markAgain){
             activeTask.classList.remove('activeTask');
             activeTask = null;
+            updateButton.innerHTML = 'Add New Task';
+            document.getElementById('updatePanel').innerHTML = 'Add Task:'
         } else {
+            updateButton.innerHTML = 'Update Task';
+            document.getElementById('updatePanel').innerHTML = 'Edit Task:'
             let thisName = target.getAttribute('data-name');
             let thisDuration = parseFloat(target.getAttribute('data-duration'));
             let thisColor = target.getAttribute('data-color');
@@ -312,7 +351,9 @@ function updateActive(dayChange=0){
         if (thiscolor.trim() == '') thiscolor = '#3333aa';
 
         let thisTask = [thisname, duration_days, thiscolor];
-        allTasks.push(thisTask);
+        Tasks[1].push(thisTask);
+        console.log("pushing task as new...");
+        console.log(thisTask);
         //let w1 = document.querySelectorAll('.oneweek')[1];
         //w1 = w1.clientWidth - 1;
         //drawAllTasks(allTasks, timeline, tnew, w1);
@@ -366,3 +407,45 @@ function getWeekNumber(d) {
     // Return array of year and week number
     return [d.getUTCFullYear(), weekNo];
 }
+
+function loadFromExternalFile(){
+    let fileToLoad = loadfile.files[0];
+    if (fileToLoad != ''){
+        console.log(fileToLoad);
+        var reader = new FileReader(); 
+        reader.onload = function(e) {
+                    konsola.value = reader.result;
+                    grabDataFromConsole();
+                }
+        reader.readAsText(fileToLoad); 
+                
+    } else {
+        console.log('No file selected');
+    }
+}
+
+function loadDefaultData(){
+        console.log(preloadeddata);
+        konsola.value =  preloadeddata.contentWindow.body.innerHTML;
+
+        //grabDataFromConsole();
+}
+
+function download(){
+
+    grabDataToConsole();
+    var text = konsola.value;
+    text = text.trim();
+    if (text.length > 0){
+        text = text.replace(/\n/g, "\r\n"); // To retain the Line breaks.
+        var blob = new Blob([text], { type: "text/plain"});
+        var anchor = document.createElement("a");
+        anchor.download = "timelines.gantt";
+        anchor.href = window.URL.createObjectURL(blob);
+        anchor.target ="_blank";
+        anchor.style.display = "none"; // just to be safe!
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    }
+ }

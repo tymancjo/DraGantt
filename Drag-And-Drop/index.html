@@ -12,6 +12,7 @@
   <title>Document</title>
 </head>
 <body>
+    <div id="tod" class="today"><div class="tdtxt">TODAY</div></div>
   <div class="weeks">
       <div id="fweek"class="oneweek" draggable="false"></div>
 
@@ -22,8 +23,7 @@
       <div id="timeline" class="container"></div>
       TIMELINE 1
       <div id="trashcan" class="container trash"></div>
-      TRASHCAN  <button id="cleartrash">Empty Trash Line</button>
-
+      TRASHCAN  
       <div class="sourcecontainer">
         <div id="enew" class="draggable fresh" draggable="true">Void</div>
         <div id="tnew" class="draggable fresh" draggable="true">New</div>
@@ -31,39 +31,50 @@
 
       <div class="terminal">
            <div class="tleft">
+            <button id="loaddefault" class="hidden">Load Server Data</button>
+               <h3 id="updatePanel">Add task:</h3>
                Task name:
                <br>
                <input type=text id="activeName"></input>
                <br>
                Task duration [days]:
                <br>
-               <input type=text id="activeDuration"></input>
-               <br>
+               <input type=text id="activeDuration" size="8"></input>
             <button id="activeDn">-</button>
             <button id="activeUp">+</button>
-            <button id="activeUpdate">Update</button>
-               <br>
-               <input type=text id="activeColor"></input>
-               <br>
-               <div class="palette" id="colorPalette"></div>
+           <br>
+           Task color:
+           <br>
+           <input type=text id="activeColor" size="8"></input>
+           <button id="activeUpdate" class="savebtn">Update</button>
+           <br>
+           <div class="palette" id="colorPalette"></div>
 
            </div>
           <div class="tleft">
-            Add new tasks to TIMELINE 1
+              <div id="kcolaps" class="hidden">
+            Text console, for data input/output
             <br>
             <textarea id="konsola" name="konsola" rows="4" cols="50">
-A:3
-B:2
-C:1
-D:2
             </textarea>
             <br>
-            <button id="grabdata">text to tasks</button>
-            <button id="getastext">read to text</button>
-            <!--<button id="refresh">Refresh View</button>-->
-            <!--<button id="readback">RB</button>-->
+            <button id="grabdata">Make Tasks from Text</button>
+            <button id="getastext">Read Timelines to Text</button>
+            <br>
+            <br>
+            <button id="cleartrash">Empty Trash Line</button>
+            <br>
+            <input id="fileinput" type="file" name="name" accept=".txt, .gantt, /text.*" style="display: none;"></input>
+            <br>
+            </div>
+            <button id="loadfilebutton" class="savebtn loadbtn">Load and Add</button>
+            <button id="savefilebutton" class="savebtn">Save to File</button>
+              <button id="toggler">Show</button>
+
            </div>
       </div>
+  </div>
+  <div>
   </div>
 </body>
 </html>
