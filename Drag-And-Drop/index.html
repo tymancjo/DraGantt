@@ -9,7 +9,7 @@
   <script src="script.js" defer></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
-  <title>Document</title>
+  <title>DraGantt - Drag & Drop scheduler</title>
 </head>
 <body>
     <div id="tod" class="today">
@@ -35,7 +35,6 @@
 
       <div class="terminal">
            <div class="tleft">
-            <button id="loaddefault" class="hidden">Load Server Data</button>
                <h3 id="updatePanel">Add task:</h3>
                Task name:
                <br>
@@ -50,7 +49,7 @@
            Task color:
            <br>
            <input type=text id="activeColor" size="8"></input>
-           <button id="activeUpdate" class="savebtn">Update</button>
+           <button id="activeUpdate" class="savebtn">Add Task</button>
            <br>
            <div class="palette" id="colorPalette"></div>
 
@@ -65,6 +64,7 @@
             <button id="grabdata">Make Tasks from Text</button>
             <button id="getastext">Read Timelines to Text</button>
             <br>
+            <button id="clearAllBtn">Clear All Timelies!</button>
             <br>
             <button id="cleartrash">Empty Trash Line</button>
             <br>

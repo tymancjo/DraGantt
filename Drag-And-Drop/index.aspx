@@ -9,16 +9,17 @@
   <script src="script.js" defer></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
-  <title>BB.LAB - Schedule - DraGantt</title>
+  <title>DraGantt - Drag & Drop scheduler</title>
 </head>
 <body>
-    <div id="tod" class="today"><div class="tdtxt">TODAY</div></div>
+    <div id="tod" class="today">
+        <!--<div class="tdtxt">TODAY</div>-->
+    </div>
   <div class="weeks">
       <div id="fweek"class="oneweek" draggable="false"></div>
 
   </div>
   <div class="first">
-      <span class="hooked">BB.LAB test schedule (informational)</span>
       <div id="timeline0" class="container"></div>
       <span class="hooked">TIMELINE 0</span>
       <div id="timeline" class="container"></div>
@@ -34,7 +35,6 @@
 
       <div class="terminal">
            <div class="tleft">
-            <button id="loaddefault" class="hidden">Load Server Data</button>
                <h3 id="updatePanel">Add task:</h3>
                Task name:
                <br>
@@ -49,7 +49,7 @@
            Task color:
            <br>
            <input type=text id="activeColor" size="8"></input>
-           <button id="activeUpdate" class="savebtn">Update</button>
+           <button id="activeUpdate" class="savebtn">Add Task</button>
            <br>
            <div class="palette" id="colorPalette"></div>
 
@@ -64,6 +64,7 @@
             <button id="grabdata">Make Tasks from Text</button>
             <button id="getastext">Read Timelines to Text</button>
             <br>
+            <button id="clearAllBtn">Clear All Timelies!</button>
             <br>
             <button id="cleartrash">Empty Trash Line</button>
             <br>
@@ -79,6 +80,5 @@
   </div>
   <div>
   </div>
-  
 </body>
 </html>

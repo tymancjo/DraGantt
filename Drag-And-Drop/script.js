@@ -6,6 +6,8 @@ let allTasks1 = [];
 
 let draggables = document.querySelectorAll('.draggable')
 let activeTask = null;
+let activeTimeline = null;
+let activeId = null;
 
 const containers = document.querySelectorAll('.container')
 const calendar = document.querySelectorAll('.weeks')[0];
@@ -48,8 +50,20 @@ getastext.addEventListener('click', grabDataToConsole);
 cleartrash.addEventListener('click', clearTrash);
 loadfile.addEventListener('change', loadFromExternalFile);
 loadfilebutton.addEventListener('click', ()=>{loadfile.click();});
-loaddefault.addEventListener('click', loadDefaultData);
 savefilebutton.addEventListener('click', download );
+
+clearAllBtn.addEventListener('click', ()=>{
+    var r = confirm("Confirm deleting all tasks!");
+    if (r){
+        clearAll();
+        readFrom();
+        activeId = null;
+        activeTimeline = null;
+        activeTask = null;
+        updateButton.innerHTML = 'Add Task';
+        document.getElementById('updatePanel').innerHTML = 'Add Task:'
+    } 
+} );
 
 // panel buttons actions binding
 activeUpdate.addEventListener('click', ()=> {updateActive(0)});
@@ -296,6 +310,11 @@ function drawAllTasks(tasks, parentObject, newTaskObj){
         redrawTask(newItem, thisname, thiscolor, duration, i);
 
         parentObject.appendChild(newItem);
+        
+        // reselecting previous activeTask
+        if (i==activeId && parentObject==activeTimeline){
+            makeActive(newItem);
+        }
     } );
     makeSetup(); // to bind event handlers
 }
@@ -312,6 +331,12 @@ function clearTrash(){
     drawAllTasks([], trashcan, tnew, 0);
 }
 
+function clearAll(){
+    Tasks.forEach((tsk,i)=>{
+        drawAllTasks([], Timelines[i], tnew, 0);
+    })
+}
+
 function readFrom(){
     Tasks.forEach((tsk,i)=>{
         Tasks[i] = readFromTimeline(Timelines[i]);
@@ -325,7 +350,14 @@ function readFromTimeline(timelineObject){
 
     let tempTasks = [];
     for( i=0; i < allChildren.length; i++ ){
+
+        // memorizing the activeTask coordinates
         el = allChildren[i];
+        if (el == activeTask){
+            activeTimeline = timelineObject;
+            activeId = i;
+        }
+
         let thisName = el.getAttribute('data-name');
         let thisDuration = parseFloat(el.getAttribute('data-duration'));
         let thisColor = el.getAttribute('data-color');
@@ -341,7 +373,7 @@ function makeActive(target, markAgain = true){
         if (target == activeTask && markAgain){
             activeTask.classList.remove('activeTask');
             activeTask = null;
-            updateButton.innerHTML = 'Add New Task';
+            updateButton.innerHTML = 'Add Task';
             document.getElementById('updatePanel').innerHTML = 'Add Task:'
         } else {
             updateButton.innerHTML = 'Update Task';
@@ -394,7 +426,7 @@ function updateActive(dayChange=0){
         updateControl();
         readFrom();
         refreshTimeline();
-        makeActive(activeTask, false);
+        //makeActive(activeTask, false);
     } else {
         thisname = aName.value.trim();
         if (thisname == '') thisname = "New Task";
