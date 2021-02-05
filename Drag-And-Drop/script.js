@@ -81,9 +81,17 @@ console.log(curretnWeek + "//" + dayOfWeek);
 
 calendar.removeChild(oneweek);
 
+let yearStart = dayOfYear(1).getDay();
+let dayShift = 0;
+if (yearStart > 4) dayShift = 1 + (8 - yearStart);
+console.log("Start : " + yearStart + "  "+ dayShift);
+
 for (let i=1; i < 53; i++){
     let newweek = oneweek.cloneNode(true);
-    newweek.innerText = i;
+    let weekStartDate = dayOfYear(dayShift + (i-1)*7);
+    console.log(i + "<br>" + weekStartDate.toLocaleDateString());
+
+    newweek.innerHTML = i + "<br>" + weekStartDate.toLocaleDateString();
     if (i < curretnWeek) newweek.classList.add('pastWeek');
     if (i == curretnWeek) newweek.classList.add('currentWeek');
     calendar.appendChild(newweek);
@@ -97,7 +105,7 @@ for (let i=1; i < 53; i++){
         tod.style.marginLeft = sizeTxt;
 
 // reading some data from default file from server
-//loadFileAndPrintToConsole('https://threejsfundamentals.org/LICENSE');
+loadFileAndPrintToConsole('default.gantt');
 //readTextFile('./def.data');
 
 draggables.forEach(element => {
@@ -140,6 +148,9 @@ async function loadFileAndPrintToConsole(url) {
     const response = await fetch(url);
     const data = await response.text();
     console.log(data);
+    konsola.value = data;
+    grabDataFromConsole();
+
   } catch (err) {
     console.error(err);
   }
@@ -227,11 +238,47 @@ function drawAllTasks(tasks, parentObject, newTaskObj){
     // cleaning all childes from parent object
     while (parentObject.firstChild)
         parentObject.removeChild(parentObject.lastChild);
+    // real time tracking
+    let daysSofar = dayShift;
 
     // adding new childes
     tasks.forEach( (el,i) => {
         duration_days = el[1];
         duration = duration_days / 5; // as making from days to weeks
+
+        // calculation for dates
+        startDate = dayOfYear(daysSofar);
+
+        // figure out how many weekends...
+        // looping over the days and adding the Saturday and Sundays
+        // if encounter 
+
+        thisDayOfWeek = startDate.getDay();
+
+        calendarDays = 0;
+        d = 0;
+        while ( d < duration_days - 1){
+            d++;
+            calendarDays++;
+            thisDayOfWeek++;
+
+            if(thisDayOfWeek == 6){
+                // we are in weekend day
+                calendarDays += 2;
+                thisDayOfWeek = 1;
+            } 
+        }
+
+        
+        startDate = startDate.toLocaleDateString()
+        daysSofar += calendarDays; 
+        endDate = dayOfYear(daysSofar).toLocaleDateString();
+        // adding one day - to not start next tas on the same date
+        daysSofar++;
+        // checking to not start on weekend
+        if(  dayOfYear(daysSofar).getDay()== 6 ) daysSofar += 2;
+        if(  dayOfYear(daysSofar).getDay()== 0 ) daysSofar += 1;
+
         thisname = el[0];
         thiscolor = el[2];
 
@@ -241,6 +288,11 @@ function drawAllTasks(tasks, parentObject, newTaskObj){
         newItem.setAttribute('data-name',thisname);
         newItem.setAttribute('data-duration',duration_days);
         newItem.setAttribute('data-color',thiscolor);
+        newItem.setAttribute('data-start', startDate);
+        newItem.setAttribute('data-end', endDate);
+
+        newItem.setAttribute('title', startDate +" : "+endDate );
+
         redrawTask(newItem, thisname, thiscolor, duration, i);
 
         parentObject.appendChild(newItem);
@@ -339,9 +391,10 @@ function updateActive(dayChange=0){
 
             redrawTask(activeTask, thisname, thiscolor, duration, i);
 
-        makeActive(activeTask, false);
         updateControl();
         readFrom();
+        refreshTimeline();
+        makeActive(activeTask, false);
     } else {
         thisname = aName.value.trim();
         if (thisname == '') thisname = "New Task";
@@ -355,9 +408,6 @@ function updateActive(dayChange=0){
         Tasks[1].push(thisTask);
         console.log("pushing task as new...");
         console.log(thisTask);
-        //let w1 = document.querySelectorAll('.oneweek')[1];
-        //w1 = w1.clientWidth - 1;
-        //drawAllTasks(allTasks, timeline, tnew, w1);
         refreshTimeline();
     }
 }
@@ -428,7 +478,6 @@ function loadFromExternalFile(){
 function loadDefaultData(){
         console.log(preloadeddata);
         konsola.value =  preloadeddata.contentWindow.body.innerHTML;
-
         //grabDataFromConsole();
 }
 
@@ -450,3 +499,9 @@ function download(){
         document.body.removeChild(anchor);
     }
  }
+
+
+function dayOfYear(dayOfYear) {
+  year = (new Date()).getFullYear();
+  return new Date(Date.UTC(year, 0, dayOfYear)) 
+}
