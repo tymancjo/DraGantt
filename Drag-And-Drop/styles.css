@@ -87,6 +87,10 @@ body {
     background-color: rgba(150,100,100,0.4);
 
 }
+
+.container.short {
+    min-width: 300px;
+}
 .first {
     padding-top: 50px;
     min-width: 5300px;

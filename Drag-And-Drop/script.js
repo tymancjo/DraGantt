@@ -1,38 +1,27 @@
 const colors = ['#28559a','#3778c2','#4b9fe1','#63bce5','#7ed5eaj','#9cf6fb','#e1fcfd','#394f8a','#4a5fc1','#e5b9a8','#ead6cd'];
 
-let allTasks0 = [];
-let allTasks  = [];
-let allTasks1 = [];
+let draggables;
+let containers;
 
-let draggables      = document.querySelectorAll('.draggable');
-let activeTask      = null;
-let activeTimeline  = null;
-let activeId        = null;
-
-const containers    = document.querySelectorAll('.container');
+const timelines_cnt = document.getElementById('timeline_cointainer');
+const bufor         = document.getElementById('bufor');
 const calendar      = document.querySelectorAll('.weeks')[0];
 const zasobnik      = document.querySelectorAll('.sourcecontainer')[0];
 const grabdata      = document.getElementById('grabdata');
 const konsola       = document.getElementById('konsola');
-
 const oneweek       = document.getElementById('fweek');
-const timeline0     = document.getElementById('timeline0');
-const timeline      = document.getElementById('timeline');
 const tnew          = document.getElementById('tnew');
-const enew          = document.getElementById('enew');
 const aName         = document.getElementById('activeName');
 const aDuration     = document.getElementById('activeDuration');
 const aColor        = document.getElementById('activeColor');
 const tod           = document.getElementById('tod');
 const updateButton  = document.getElementById('activeUpdate');
 const loadfile      = document.getElementById('fileinput');
-const preloadeddata = document.getElementById('preloadeddata');
 const kcolaps       = document.getElementById('kcolaps');
 
-let Tasks           = [allTasks0, allTasks, allTasks1];
-let Timelines       = [timeline0, timeline, timeline1];
-
-// Dynamically creating timelines routine
+let activeTask      = null;
+let activeTimeline  = null;
+let activeId        = null;
 
 
 // binding action to resize scroll and so on event
@@ -46,10 +35,10 @@ document.addEventListener('click', function(e) {
 }, false);
 
 // binding the action to the button
-grabdata.addEventListener('click', grabDataFromConsole);
-getastext.addEventListener('click', grabDataToConsole);
-cleartrash.addEventListener('click', clearTrash);
-loadfile.addEventListener('change', loadFromExternalFile);
+      grabdata.addEventListener('click', grabDataFromConsole);
+     getastext.addEventListener('click', grabDataToConsole);
+    cleartrash.addEventListener('click', clearTrash);
+      loadfile.addEventListener('change', loadFromExternalFile);
 loadfilebutton.addEventListener('click', ()=>{loadfile.click();});
 savefilebutton.addEventListener('click', download );
 
@@ -68,15 +57,12 @@ clearAllBtn.addEventListener('click', ()=>{
 
 // panel buttons actions binding
 activeUpdate.addEventListener('click', ()=> {updateActive(0)});
-activeUp.addEventListener('click', () => {updateActive(1)});
-activeDn.addEventListener('click', () => {updateActive(-1)});
-toggler.addEventListener('click', toggleKonsola);
+    activeUp.addEventListener('click', () => {updateActive(1)});
+    activeDn.addEventListener('click', () => {updateActive(-1)});
+     toggler.addEventListener('click', toggleKonsola);
 
-// some variables
 let konsolaState = false;
-
 function toggleKonsola(){
-    console.log("coś tam robię")
     if ( konsolaState ) {
         kcolaps.classList.add('hidden');
         toggler.innerText = "Show";
@@ -92,36 +78,73 @@ const isNow = new Date();
 const curretnWeek = getWeekNumber(isNow)[1];
 let dayOfWeek = isNow.getDay();
 if(dayOfWeek > 5) dayOfWeek = 5; // just using work days
-console.log(curretnWeek + "//" + dayOfWeek);
 
-calendar.removeChild(oneweek);
+    calendar.removeChild(oneweek);
 
-let yearStart = dayOfYear(1).getDay();
-let dayShift = 0;
-if (yearStart > 4) dayShift = 1 + (8 - yearStart);
-console.log("Start : " + yearStart + "  "+ dayShift);
+    let yearStart = dayOfYear(1).getDay();
+    let dayShift = 0;
+    if (yearStart > 4) dayShift = 1 + (8 - yearStart);
+    console.log("Start : " + yearStart + "  "+ dayShift);
 
-for (let i=1; i < 53; i++){
-    let newweek = oneweek.cloneNode(true);
-    let weekStartDate = dayOfYear(dayShift + (i-1)*7);
-    console.log(i + "<br>" + weekStartDate.toLocaleDateString());
+    for (let i=1; i < 53; i++){
+        let newweek = oneweek.cloneNode(true);
+        let weekStartDate = dayOfYear(dayShift + (i-1)*7);
+        console.log(i + "<br>" + weekStartDate.toLocaleDateString());
 
-    newweek.innerHTML = i + "<br>" + weekStartDate.toLocaleDateString();
-    if (i < curretnWeek) newweek.classList.add('pastWeek');
-    if (i == curretnWeek) newweek.classList.add('currentWeek');
-    calendar.appendChild(newweek);
-}
+        newweek.innerHTML = i + "<br>" + weekStartDate.toLocaleDateString();
+        if (i < curretnWeek) newweek.classList.add('pastWeek');
+        if (i == curretnWeek) newweek.classList.add('currentWeek');
+        calendar.appendChild(newweek);
+    }
 
-        let w1 = document.querySelectorAll('.oneweek')[1].clientWidth - 2;
-        let d = curretnWeek - 1 + dayOfWeek  / 5;
-        let addendum = 2*Math.floor(d) -1;
-        if (addendum <= 0) addendum = 0;
-        let sizeTxt = Math.floor(addendum + 1.0 * d* w1 ) + "px";
-        tod.style.marginLeft = sizeTxt;
+            let w1 = document.querySelectorAll('.oneweek')[1].clientWidth - 2;
+            let d = curretnWeek - 1 + dayOfWeek  / 5;
+            let addendum = 2*Math.floor(d) -1;
+            if (addendum <= 0) addendum = 0;
+            let sizeTxt = Math.floor(addendum + 1.0 * d* w1 ) + "px";
+            tod.style.marginLeft = sizeTxt;
 
 // reading some data from default file from server
 loadFileAndPrintToConsole('default.gantt');
 //readTextFile('./def.data');
+
+// Dynamically creating timelines routine
+// the idea:
+// create the timeline objects using a proto object
+// and keep those in the array. It probably good idea to
+// use some  kind of structure for this...
+class tml {
+    constructor(Container){
+        this.Container = Container;
+        this.Data = [];
+        this.Name = 'Timeline ';
+}}
+
+let Timelines_no   = 3;
+let timeline_list  = [];
+let new_cointainer = document.getElementById('timeline').cloneNode(true);
+let new_coint_txt  = document.getElementById('timeline_txt_0').cloneNode(true);
+
+while (timelines_cnt.firstChild)
+    timelines_cnt.removeChild(timelines_cnt.lastChild);
+
+for (i=0; i < Timelines_no; i++){
+    let this_cointainer      = new_cointainer.cloneNode(true);
+    let this_coint_txt       = new_coint_txt.cloneNode(true);
+    let this_timeline        = new tml(this_cointainer);
+    this_timeline.Name       = 'Timeline ' + i;
+    this_coint_txt.innerText = this_timeline.Name;
+    
+    timeline_list.push(this_timeline);
+    timelines_cnt.appendChild(this_cointainer);
+    timelines_cnt.appendChild(this_coint_txt);
+}
+// And adding the bufor 
+let this_timeline = new tml(bufor);
+this_timeline.Name = 'Bufor';
+timeline_list.push(this_timeline);
+
+makeSetup();
 
 draggables.forEach(element => {
     let w1 = document.querySelectorAll('.oneweek')[1].clientWidth - 2;
@@ -129,21 +152,6 @@ draggables.forEach(element => {
     element.style.width = sizeTxt;
 })
 
-makeSetup();
-
-containers.forEach(container => {
-  container.addEventListener('dragover', e => {
-    e.preventDefault()
-    const afterElement = getDragAfterElement(container, e.clientX)
-    const draggable = document.querySelector('.dragging')
-
-    if (afterElement == null) {
-        container.appendChild(draggable)
-    } else {
-      container.insertBefore(draggable, afterElement)
-    }
-  })
-})
 
 function getDragAfterElement(container, x) {
   const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')]
@@ -191,8 +199,11 @@ function readTextFile(file)
 
 function grabDataToConsole(){
     konsola.value = "";
-    Tasks.forEach((tsk,i)=>{
-        konsola.value += tasksToText(tsk, i);
+    //Tasks.forEach((tsk,i)=>{
+        //konsola.value += tasksToText(tsk, i);
+    //})
+    timeline_list.forEach((tsk, i)=>{
+        konsola.value += tasksToText(tsk.Data, i);
     })
 }
 
@@ -227,7 +238,8 @@ function grabDataFromConsole(){
 
             let thisTask = [thisname, duration, thiscolor];
             console.log(timelineId);
-            Tasks[timelineId].push(thisTask);
+            //Tasks[timelineId].push(thisTask);
+            timeline_list[timelineId].Data.push(thisTask);
         });
         refreshTimeline();
         konsola.value = "";
@@ -249,7 +261,9 @@ function tasksToText(tasks, timelineId=0){
 }
 
 
-function drawAllTasks(tasks, parentObject, newTaskObj){
+function drawAllTasks(tsk, newTaskObj){
+    tasks = tsk.Data;
+    parentObject = tsk.Container;
     // cleaning all childes from parent object
     while (parentObject.firstChild)
         parentObject.removeChild(parentObject.lastChild);
@@ -313,7 +327,7 @@ function drawAllTasks(tasks, parentObject, newTaskObj){
         parentObject.appendChild(newItem);
         
         // reselecting previous activeTask
-        if (i==activeId && parentObject==activeTimeline){
+        if (i==activeId && parentObject==activeTimeline.Container){
             makeActive(newItem);
         }
     } );
@@ -321,32 +335,52 @@ function drawAllTasks(tasks, parentObject, newTaskObj){
 }
 
 function refreshTimeline(){
+
+    //clearing all timeline objects
+    while (timelines_cnt.firstChild)
+        timelines_cnt.removeChild(timelines_cnt.lastChild);
+
     let w1 = document.querySelectorAll('.oneweek')[1];
     w1 = w1.clientWidth - 1;
-    Tasks.forEach((tsk,i)=>{
-        drawAllTasks(tsk, Timelines[i], tnew, w1);
+
+    timeline_list.forEach((tsk)=>{
+        if (tsk.Name != "Bufor"){
+            let this_cointainer      = new_cointainer.cloneNode(true);
+            let this_coint_txt       = new_coint_txt.cloneNode(true);
+            this_coint_txt.innerText = tsk.Name;
+
+                timelines_cnt.appendChild(this_cointainer);
+                timelines_cnt.appendChild(this_coint_txt);
+
+            tsk.Container = this_cointainer;
+        }
+            drawAllTasks(tsk, tnew, w1);
     })
+
+    makeSetup();
 }
 
 function clearTrash(){
-    drawAllTasks([], trashcan, tnew, 0);
+    timeline_list[timeline_list.length -1].Data = [];
+    drawAllTasks(timeline_list[timeline_list.length -1], tnew, 0);
 }
 
 function clearAll(){
-    Tasks.forEach((tsk,i)=>{
-        drawAllTasks([], Timelines[i], tnew, 0);
+    timeline_list.forEach((tsk)=>{
+        tsk.Data = [];
+        drawAllTasks(tsk, tnew, w1);
     })
 }
 
 function readFrom(){
-    Tasks.forEach((tsk,i)=>{
-        Tasks[i] = readFromTimeline(Timelines[i]);
+    timeline_list.forEach((tsk)=>{
+        tsk.Data = readFromTimeline(tsk);
     })
 }
 
 
 function readFromTimeline(timelineObject){
-    let allChildren = timelineObject.children;
+    let allChildren = timelineObject.Container.children;
     allChildren = Array.from(allChildren);
 
     let tempTasks = [];
@@ -429,6 +463,7 @@ function updateActive(dayChange=0){
         refreshTimeline();
         //makeActive(activeTask, false);
     } else {
+        // Creating New Task
         thisname = aName.value.trim();
         if (thisname == '') thisname = "New Task";
         i = "N";
@@ -438,9 +473,10 @@ function updateActive(dayChange=0){
         if (thiscolor.trim() == '') thiscolor = '#3333aa';
 
         let thisTask = [thisname, duration_days, thiscolor];
-        Tasks[1].push(thisTask);
+        timeline_list[timeline_list.length -1].Data.push(thisTask);
         console.log("pushing task as new...");
         console.log(thisTask);
+        activeId = null;
         refreshTimeline();
     }
 }
@@ -462,20 +498,34 @@ function redrawTask(task, thisname, thiscolor, duration, i=0){
 }
 
 function makeSetup(){
+    containers = document.querySelectorAll('.container');
+            containers.forEach(container => {
+              container.addEventListener('dragover', e => {
+                e.preventDefault()
+                const afterElement = getDragAfterElement(container, e.clientX)
+                const draggable = document.querySelector('.dragging')
+
+                if (afterElement == null) {
+                    container.appendChild(draggable)
+                } else {
+                  container.insertBefore(draggable, afterElement)
+                }
+              })
+            })
     draggables = document.querySelectorAll('.draggable')
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => {
-        draggable.classList.add('dragging')
-      })
+            draggables.forEach(draggable => {
+              draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging')
+              })
 
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('dragging')
+              draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging')
 
-          readFrom();
+                  readFrom();
 
-        refreshTimeline();
-      })
-    })
+                refreshTimeline();
+              })
+            })
 }
 
 function getWeekNumber(d) {
