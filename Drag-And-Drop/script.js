@@ -1,36 +1,38 @@
 const colors = ['#28559a','#3778c2','#4b9fe1','#63bce5','#7ed5eaj','#9cf6fb','#e1fcfd','#394f8a','#4a5fc1','#e5b9a8','#ead6cd'];
 
 let allTasks0 = [];
-let allTasks = [];
+let allTasks  = [];
 let allTasks1 = [];
 
-let draggables = document.querySelectorAll('.draggable')
-let activeTask = null;
-let activeTimeline = null;
-let activeId = null;
+let draggables      = document.querySelectorAll('.draggable');
+let activeTask      = null;
+let activeTimeline  = null;
+let activeId        = null;
 
-const containers = document.querySelectorAll('.container')
-const calendar = document.querySelectorAll('.weeks')[0];
-const zasobnik = document.querySelectorAll('.sourcecontainer')[0];
-const grabdata = document.getElementById('grabdata');
-const konsola = document.getElementById('konsola');
+const containers    = document.querySelectorAll('.container');
+const calendar      = document.querySelectorAll('.weeks')[0];
+const zasobnik      = document.querySelectorAll('.sourcecontainer')[0];
+const grabdata      = document.getElementById('grabdata');
+const konsola       = document.getElementById('konsola');
 
-const oneweek = document.getElementById('fweek');
-const timeline0 = document.getElementById('timeline0');
-const timeline = document.getElementById('timeline');
-const tnew = document.getElementById('tnew');
-const enew = document.getElementById('enew');
-const aName = document.getElementById('activeName');
-const aDuration = document.getElementById('activeDuration');
-const aColor = document.getElementById('activeColor');
-const tod = document.getElementById('tod');
-const updateButton = document.getElementById('activeUpdate');
-const loadfile = document.getElementById('fileinput');
+const oneweek       = document.getElementById('fweek');
+const timeline0     = document.getElementById('timeline0');
+const timeline      = document.getElementById('timeline');
+const tnew          = document.getElementById('tnew');
+const enew          = document.getElementById('enew');
+const aName         = document.getElementById('activeName');
+const aDuration     = document.getElementById('activeDuration');
+const aColor        = document.getElementById('activeColor');
+const tod           = document.getElementById('tod');
+const updateButton  = document.getElementById('activeUpdate');
+const loadfile      = document.getElementById('fileinput');
 const preloadeddata = document.getElementById('preloadeddata');
-const kcolaps = document.getElementById('kcolaps');
+const kcolaps       = document.getElementById('kcolaps');
 
-let Tasks = [allTasks0, allTasks, allTasks1];
-let Timelines = [timeline0, timeline, timeline1];
+let Tasks           = [allTasks0, allTasks, allTasks1];
+let Timelines       = [timeline0, timeline, timeline1];
+
+// Dynamically creating timelines routine
 
 
 // binding action to resize scroll and so on event
@@ -42,7 +44,6 @@ document.addEventListener('click', function(e) {
     var target = e.target || e.srcElement;
     makeActive(target);
 }, false);
-
 
 // binding the action to the button
 grabdata.addEventListener('click', grabDataFromConsole);
@@ -89,7 +90,7 @@ function toggleKonsola(){
 // creating the calendar for weeks
 const isNow = new Date();
 const curretnWeek = getWeekNumber(isNow)[1];
-const dayOfWeek = isNow.getDay();
+let dayOfWeek = isNow.getDay();
 if(dayOfWeek > 5) dayOfWeek = 5; // just using work days
 console.log(curretnWeek + "//" + dayOfWeek);
 
