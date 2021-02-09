@@ -499,6 +499,7 @@ function redrawTask(task, thisname, thiscolor, duration, i=0){
 
 function makeSetup(){
     containers = document.querySelectorAll('.container');
+
             containers.forEach(container => {
               container.addEventListener('dragover', e => {
                 e.preventDefault()
@@ -511,7 +512,8 @@ function makeSetup(){
                   container.insertBefore(draggable, afterElement)
                 }
               })
-            })
+            });
+
     draggables = document.querySelectorAll('.draggable')
             draggables.forEach(draggable => {
               draggable.addEventListener('dragstart', () => {
