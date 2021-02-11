@@ -37,6 +37,8 @@ document.addEventListener('click', function(e) {
 // binding the action to the button
       grabdata.addEventListener('click', grabDataFromConsole);
      getastext.addEventListener('click', grabDataToConsole);
+     getasjson.addEventListener('click', grabDataToJSON);
+     jsontodata.addEventListener('click', ()=>{ jsonToData(konsola.value) });
     cleartrash.addEventListener('click', clearTrash);
       loadfile.addEventListener('change', loadFromExternalFile);
 loadfilebutton.addEventListener('click', ()=>{loadfile.click();});
@@ -353,10 +355,11 @@ function refreshTimeline(){
                 timelines_cnt.appendChild(this_coint_txt);
 
             tsk.Container = this_cointainer;
+        } else {
+            tsk.Container = bufor;
         }
             drawAllTasks(tsk, tnew, w1);
     })
-
     makeSetup();
 }
 
@@ -589,4 +592,20 @@ function download(){
 function dayOfYear(dayOfYear) {
   year = (new Date()).getFullYear();
   return new Date(Date.UTC(year, 0, dayOfYear)) 
+}
+
+function grabDataToJSON(){
+    let dataJSON = JSON.stringify(timeline_list);
+    konsola.value = dataJSON;
+}
+
+function jsonToData(jsonObject){
+    let newObj;
+    try{
+        newObj = JSON.parse(jsonObject);
+        timeline_list = newObj;
+        refreshTimeline();
+    } catch (e) {
+        console.error(e);
+    }
 }

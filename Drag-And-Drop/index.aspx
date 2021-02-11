@@ -56,6 +56,8 @@
            <input type=text id="activeColor" size="8"></input>
            <button id="activeUpdate" class="savebtn">Add Task</button>
            <br>
+            <button id="cleartrash" class="savebtn loadbtn">Empty Bufor</button>
+            <br>
            <div class="palette" id="colorPalette"></div>
 
            </div>
@@ -69,9 +71,7 @@
             <button id="grabdata">Make Tasks from Text</button>
             <button id="getastext">Read Timelines to Text</button>
             <br>
-            <button id="clearAllBtn">Clear All Timelies!</button>
-            <br>
-            <button id="cleartrash">Empty Trash Line</button>
+            <button id="clearAllBtn" class="savebtn loadbtn">Clear All Timeliness!</button>
             <br>
             <input id="fileinput" type="file" name="name" accept=".txt, .gantt, /text.*" style="display: none;"></input>
             <br>
